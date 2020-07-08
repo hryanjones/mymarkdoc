@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes"/>
+
+<style>
+    #container[contenteditable="true"] {
+        white-space: pre-wrap;
+    }
+
+    html, body {
+        font-family: sans-serif;
+    }
+
+    #edit-toggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        font-size: 1.3em;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@11.0.0/dist/markdown-it.min.js"></script>
+</head>
+<body>
+    <div id="container"></div>
+    <button id="edit-toggle">edit</button>
+<script>
+    const markdownit = window.markdownit({html: false});
+    const container = document.getElementById('container');
+    const editToggleButton = document.getElementById('edit-toggle');
+
+    const exampleText = `
+# MyMarkDoc
+
+## How to use
+
+1. Click the "edit" button on the top right
+2. Edit the markdown
+3. Click "DONE"
+  - now the document is saved in your browser, you can reopen it any time
+
+`;
+
+    render(false);
+
+    editToggleButton.onclick = toggleEdit;
+
+    function toggleEdit() {
+        const isEditing = editToggleButton.innerText === 'DONE';
+        editToggleButton.innerText = isEditing ? 'edit' : 'DONE';
+        if (isEditing) {
+            saveRawDoc();
+        }
+        render(!isEditing);
+    }
+
+    function getSavedRawDoc() {
+        return localStorage.getItem('markdoc') || exampleText;
+    }
+
+    function saveRawDoc() {
+        localStorage.setItem('markdoc', container.innerText);
+    }
+
+    function render(isEditing) {
+        const rawMarkdown = getSavedRawDoc();
+        container.setAttribute('contenteditable', isEditing);
+        if (isEditing) {
+            container.innerText = rawMarkdown;
+        } else {
+            container.innerHTML = markdownit.render(rawMarkdown);
+        }
+    }
+
+</script>
+<script src="/assets/js/googleAnalytics.js"></script>
+</body>
+</html>
